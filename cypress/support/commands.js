@@ -1,4 +1,4 @@
-import LoginPage from '../pages/LoginPage'
+import LoginPage from '../pages/loginPage'
 
 Cypress.Commands.add('login', (username, password) => {
   LoginPage.visit()

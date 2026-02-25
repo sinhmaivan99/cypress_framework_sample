@@ -1,0 +1,145 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 3,
+    "passes": 3,
+    "pending": 0,
+    "failures": 0,
+    "start": "2026-02-25T03:27:47.153Z",
+    "end": "2026-02-25T03:27:54.260Z",
+    "duration": 7107,
+    "testsRegistered": 3,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "c24d7d14-adb9-4260-ae99-01eb755f6014",
+      "title": "",
+      "fullFile": "cypress\\e2e\\login.cy.js",
+      "file": "cypress\\e2e\\login.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "294bd391-83bb-4361-ad82-51b191acd43d",
+          "title": "SauceDemo Login Tests",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Login thành công với user hợp lệ",
+              "fullTitle": "SauceDemo Login Tests Login thành công với user hợp lệ",
+              "timedOut": null,
+              "duration": 3217,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.login(this.data.validUser.username, this.data.validUser.password);\ncy.url().should('include', '/inventory.html');",
+              "err": {},
+              "uuid": "d9aa9ead-bec7-4c2f-aa42-5f0cf214c053",
+              "parentUUID": "294bd391-83bb-4361-ad82-51b191acd43d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Login thất bại với user sai thông tin",
+              "fullTitle": "SauceDemo Login Tests Login thất bại với user sai thông tin",
+              "timedOut": null,
+              "duration": 1086,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.login(this.data.invalidUser.username, this.data.invalidUser.password);\n_loginPage.default.elements.errorMessage().should('be.visible').and('contain.text', 'Username and password do not match');",
+              "err": {},
+              "uuid": "002c45d0-6317-43aa-a88a-73e184421bf6",
+              "parentUUID": "294bd391-83bb-4361-ad82-51b191acd43d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Login thất bại với user bị khóa",
+              "fullTitle": "SauceDemo Login Tests Login thất bại với user bị khóa",
+              "timedOut": null,
+              "duration": 2703,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.login(this.data.lockedUser.username, this.data.lockedUser.password);\n_loginPage.default.elements.errorMessage().should('be.visible').and('contain.text', 'Sorry, this user has been locked out.');",
+              "err": {},
+              "uuid": "6f6f3460-738a-497c-99b1-34254e0cd1a1",
+              "parentUUID": "294bd391-83bb-4361-ad82-51b191acd43d",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "d9aa9ead-bec7-4c2f-aa42-5f0cf214c053",
+            "002c45d0-6317-43aa-a88a-73e184421bf6",
+            "6f6f3460-738a-497c-99b1-34254e0cd1a1"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 7006,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "reports/mochawesome",
+        "overwrite": false,
+        "html": true,
+        "json": true,
+        "charts": true,
+        "reportPageTitle": "SauceDemo Test Report"
+      },
+      "version": "6.2.0"
+    }
+  }
+}
