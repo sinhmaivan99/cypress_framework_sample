@@ -2,13 +2,16 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '22.14.0'  // Adjust based on your Node.js version
+        NODE_VERSION = '22.14.0'
+    }
+
+    triggers {
+        cron('15 10 * * 1-5')  // Chạy lúc 17h15 giờ VN (10h15 UTC) từ thứ 2 đến thứ 6 hàng tuần
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Assuming the code is in a Git repository
                 checkout scm
             }
         }
@@ -33,7 +36,6 @@ pipeline {
 
         stage('Generate Reports') {
             steps {
-                // Publish Mochawesome reports if configured
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
@@ -54,11 +56,9 @@ pipeline {
 
     post {
         always {
-            // Clean up or send notifications if needed
             echo 'Pipeline completed.'
         }
         failure {
-            // Handle failures, e.g., send email
             echo 'Pipeline failed.'
         }
     }
