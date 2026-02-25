@@ -19,6 +19,12 @@ pipeline {
             }
         }
 
+        stage('Install Cypress') {
+            steps {
+                bat 'npx cypress install'
+            }
+        }
+
         stage('Run Cypress Tests') {
             steps {
                 bat 'npx cypress run --spec "cypress/e2e/login.cy.js"'
