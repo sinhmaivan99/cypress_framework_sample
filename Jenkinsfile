@@ -5,6 +5,10 @@ pipeline {
         NODE_VERSION = '22.14.0'
     }
 
+    triggers {
+        cron('H 11 * * 1-5')  // Chạy lúc khoảng 18h giờ VN (11h UTC) từ thứ 2 đến thứ 6 hàng tuần (H để phân bổ load)
+    }
+
     stages {
         stage('Checkout') {
             steps {
