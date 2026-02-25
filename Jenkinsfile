@@ -6,7 +6,7 @@ pipeline {
     }
 
     triggers {
-        cron('15 10 * * 1-5')  // Chạy lúc 17h15 giờ VN (10h15 UTC) từ thứ 2 đến thứ 6 hàng tuần
+        cron('20 10 * * 1-5')  // Chạy lúc 17h20 giờ VN (10h20 UTC) từ thứ 2 đến thứ 6 hàng tuần
     }
 
     stages {
