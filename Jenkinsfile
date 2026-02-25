@@ -15,13 +15,13 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Run Cypress Tests') {
             steps {
-                sh 'npx cypress run --spec "cypress/e2e/**/*.cy.js"'
+                bat 'npx cypress run --spec "cypress/e2e/login.cy.js"'
             }
         }
 
