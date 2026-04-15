@@ -1,12 +1,13 @@
-import LoginPage from '../pages/loginPage'
+import LoginPage from '../pages/LoginPage'
 
 describe('SauceDemo Login Tests', () => {
   beforeEach(() => {
-    cy.fixture('users').as('data')
+    cy.fixture('auth/users').as('data')
   })
 
   it('Login thành công với user hợp lệ', function () {
-    cy.login(this.data.validUser.username, this.data.validUser.password)
+    cy.loginBySession(this.data.validUser.username, this.data.validUser.password)
+    cy.visit('/inventory.html')
     cy.url().should('include', '/inventory.html')
   })
 

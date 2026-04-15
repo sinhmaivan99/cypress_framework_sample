@@ -18,7 +18,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                bat 'npm install'
+                bat 'npm ci'
             }
         }
 
@@ -28,14 +28,9 @@ pipeline {
             }
         }
 
-        stage('Run Cypress Tests') {
+        stage('Run Cypress Tests + Build Report') {
             steps {
-                bat 'npx cypress run --spec "cypress/e2e/login.cy.js"'
-            }
-        }
-
-        stage('Generate Reports') {
-            steps {
+                bat 'npm run test:report'
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: true,
