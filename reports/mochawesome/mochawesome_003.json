@@ -1,0 +1,150 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 3,
+    "passes": 2,
+    "pending": 0,
+    "failures": 1,
+    "start": "2026-05-04T03:14:29.636Z",
+    "end": "2026-05-04T03:14:42.249Z",
+    "duration": 12613,
+    "testsRegistered": 3,
+    "passPercent": 66.66666666666666,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "ac0ab3fe-2d17-4063-86f9-f8f2a54adf0f",
+      "title": "",
+      "fullFile": "cypress\\e2e\\login.cy.ts",
+      "file": "cypress\\e2e\\login.cy.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "9d4d615a-bcd8-4732-bead-069d6802deff",
+          "title": "SauceDemo - Login",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "logs in successfully with a valid user",
+              "fullTitle": "SauceDemo - Login logs in successfully with a valid user",
+              "timedOut": null,
+              "duration": 1186,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": null,
+              "code": "cy.loginBySession(users.validUser);\ncy.visit(constants_1.Routes.inventory);\ncy.url().should('include', constants_1.Routes.inventory);",
+              "err": {
+                "message": "CypressError: `cy.visit()` failed trying to load:\n\nhttps://www.saucedemo.com/inventory.html\n\nThe response we received from your web server was:\n\n  > 404: Not Found\n\nThis was considered a failure because the status code was not `2xx`.\n\nIf you do not want status codes to cause failures pass the option: `failOnStatusCode: false`\n\nThis error occurred while validating the created session. Because validation failed immediately after creating the session, we failed the test.",
+                "estack": "CypressError: `cy.visit()` failed trying to load:\n\nhttps://www.saucedemo.com/inventory.html\n\nThe response we received from your web server was:\n\n  > 404: Not Found\n\nThis was considered a failure because the status code was not `2xx`.\n\nIf you do not want status codes to cause failures pass the option: `failOnStatusCode: false`\n\nThis error occurred while validating the created session. Because validation failed immediately after creating the session, we failed the test.\n    at <unknown> (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:134835:76)\n    at visitFailedByErr (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:134425:12)\n    at <unknown> (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:134818:13)\n    at tryCatcher (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise._settlePromiseFromHandler (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:1489:31)\n    at Promise._settlePromise (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:1546:18)\n    at Promise._settlePromise0 (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:1591:10)\n    at Promise._settlePromises (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:1667:18)\n    at _drainQueueStep (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:2377:12)\n    at _drainQueue (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:2370:9)\n    at Async._drainQueues (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:2386:5)\n    at Async.drainQueues (https://www.saucedemo.com/__cypress/runner/cypress_runner.js:2256:14)",
+                "diff": null
+              },
+              "uuid": "5c6a059e-1ec4-49e7-b275-66a45d717c7b",
+              "parentUUID": "9d4d615a-bcd8-4732-bead-069d6802deff",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "shows an error for invalid credentials",
+              "fullTitle": "SauceDemo - Login shows an error for invalid credentials",
+              "timedOut": null,
+              "duration": 877,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.login(users.invalidUser);\nLoginPage_1.default.expectErrorContains(constants_1.LoginErrors.invalidCredentials);",
+              "err": {},
+              "uuid": "1442ac8f-3bee-4115-89b4-4ee1dd02fb48",
+              "parentUUID": "9d4d615a-bcd8-4732-bead-069d6802deff",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "shows an error for a locked-out user",
+              "fullTitle": "SauceDemo - Login shows an error for a locked-out user",
+              "timedOut": null,
+              "duration": 927,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.login(users.lockedUser);\nLoginPage_1.default.expectErrorContains(constants_1.LoginErrors.lockedOut);",
+              "err": {},
+              "uuid": "6296140b-b758-4345-a2ad-2aa0b7f9d2db",
+              "parentUUID": "9d4d615a-bcd8-4732-bead-069d6802deff",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "1442ac8f-3bee-4115-89b4-4ee1dd02fb48",
+            "6296140b-b758-4345-a2ad-2aa0b7f9d2db"
+          ],
+          "failures": [
+            "5c6a059e-1ec4-49e7-b275-66a45d717c7b"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 2990,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "reportPageTitle": "SauceDemo | dev | Build local | local @ local",
+        "reportDir": "reports/mochawesome",
+        "overwrite": false,
+        "html": true,
+        "json": true,
+        "charts": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

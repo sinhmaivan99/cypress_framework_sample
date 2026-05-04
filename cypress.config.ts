@@ -1,5 +1,6 @@
-import { defineConfig } from "cypress";
-import * as fs from "fs";
+import { defineConfig } from 'cypress';
+import * as fs from 'fs';
+import { resolveEnvironment, buildReportTitle } from './cypress/config/environment';
 
 export default defineConfig({
   retries: {
@@ -15,48 +16,32 @@ export default defineConfig({
   trashAssetsBeforeRuns: true,
   e2e: {
     setupNodeEvents(on, config) {
-      const baseUrls: Record<string, string> = {
-        dev: "https://www.saucedemo.com/",
-        staging: process.env.CYPRESS_BASE_URL_STAGING ?? "https://www.saucedemo.com/",
-        prod: process.env.CYPRESS_BASE_URL_PROD ?? "https://www.saucedemo.com/",
-      };
+      const { environment, baseUrl } = resolveEnvironment(config);
+      config.baseUrl = baseUrl;
+      config.env.environment = environment;
 
-      const environment =
-        (config.env.environment as string) ?? process.env.TEST_ENV ?? "dev";
-      config.baseUrl =
-        (config.env.baseUrl as string) ??
-        process.env.CYPRESS_BASE_URL ??
-        baseUrls[environment] ??
-        baseUrls["dev"];
-
-      // Enrich report title with CI build metadata (Jenkins sets these automatically)
-      const buildNumber = process.env.BUILD_NUMBER ?? "local";
-      const gitBranch = process.env.GIT_BRANCH ?? process.env.BRANCH_NAME ?? "local";
-      const gitCommit = process.env.GIT_COMMIT?.substring(0, 7) ?? "local";
       if (config.reporterOptions) {
-        (config.reporterOptions as Record<string, unknown>)["reportPageTitle"] =
-          `SauceDemo | ${environment} | Build ${buildNumber} | ${gitBranch} @ ${gitCommit}`;
+        (config.reporterOptions as Record<string, unknown>).reportPageTitle =
+          buildReportTitle(environment);
       }
 
-      // Keep video only when spec has failures — reduces artifact noise
-      on("after:spec", (_spec, results) => {
-        if (results?.video && results.stats.failures === 0) {
-          if (fs.existsSync(results.video)) {
-            fs.unlinkSync(results.video);
-          }
+      // Discard videos for fully passing specs to keep artifacts small.
+      on('after:spec', (_spec, results) => {
+        if (results?.video && results.stats.failures === 0 && fs.existsSync(results.video)) {
+          fs.unlinkSync(results.video);
         }
       });
 
       return config;
     },
   },
-  reporter: "mochawesome",
+  reporter: 'mochawesome',
   reporterOptions: {
-    reportDir: "reports/mochawesome",
+    reportDir: 'reports/mochawesome',
     overwrite: false,
     html: true,
     json: true,
     charts: true,
-    reportPageTitle: "SauceDemo Test Report",
+    reportPageTitle: 'SauceDemo Test Report',
   },
 });

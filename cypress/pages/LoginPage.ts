@@ -1,35 +1,50 @@
+import { Routes } from '../support/constants';
+import type { User } from '../support/types';
+
+type Element = Cypress.Chainable<JQuery<HTMLElement>>;
+
+/**
+ * Page Object for the SauceDemo login screen.
+ *
+ * Selectors prefer the stable `data-test` attribute. The class exposes a
+ * fluent API so callers can chain page actions.
+ */
 class LoginPage {
-  elements = {
-    usernameInput: (): Cypress.Chainable<JQuery<HTMLElement>> =>
-      cy.get('[data-test="username"]').or('#user-name'),
-    passwordInput: (): Cypress.Chainable<JQuery<HTMLElement>> =>
-      cy.get('[data-test="password"]').or('#password'),
-    loginButton: (): Cypress.Chainable<JQuery<HTMLElement>> =>
-      cy.get('[data-test="login-button"]').or('#login-button'),
-    errorMessage: (): Cypress.Chainable<JQuery<HTMLElement>> =>
-      cy.get('[data-test="error"]'),
+  readonly elements = {
+    usernameInput: (): Element => cy.get('[data-test="username"]'),
+    passwordInput: (): Element => cy.get('[data-test="password"]'),
+    loginButton: (): Element => cy.get('[data-test="login-button"]'),
+    errorMessage: (): Element => cy.get('[data-test="error"]'),
   };
 
-  visit(): void {
-    cy.visit('/');
+  visit(): this {
+    cy.visit(Routes.login);
+    return this;
   }
 
-  typeUsername(username: string): void {
+  fillUsername(username: string): this {
     this.elements.usernameInput().clear().type(username);
+    return this;
   }
 
-  typePassword(password: string): void {
-    this.elements.passwordInput().clear().type(password);
+  fillPassword(password: string): this {
+    // `log: false` avoids leaking credentials into the Cypress command log.
+    this.elements.passwordInput().clear().type(password, { log: false });
+    return this;
   }
 
-  clickLogin(): void {
+  submit(): this {
     this.elements.loginButton().click();
+    return this;
   }
 
-  login(username: string, password: string): void {
-    this.typeUsername(username);
-    this.typePassword(password);
-    this.clickLogin();
+  login(user: User): this {
+    return this.fillUsername(user.username).fillPassword(user.password).submit();
+  }
+
+  expectErrorContains(message: string): this {
+    this.elements.errorMessage().should('be.visible').and('contain.text', message);
+    return this;
   }
 }
 

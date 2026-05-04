@@ -1,23 +1,34 @@
 import LoginPage from '../pages/LoginPage';
+import { Routes } from './constants';
+import type { User } from './types';
 
-Cypress.Commands.add('login', (username: string, password: string) => {
-  LoginPage.visit();
-  LoginPage.login(username, password);
+/**
+ * UI login. Use for negative test cases (invalid / locked users)
+ * where you want to assert error messaging on the login screen.
+ */
+Cypress.Commands.add('login', (user: User) => {
+  LoginPage.visit().login(user);
 });
 
-Cypress.Commands.add('loginBySession', (username: string, password: string) => {
+/**
+ * Cached login via `cy.session`. Use when a test only needs to *be*
+ * authenticated; the session is reused across tests of the same user.
+ */
+Cypress.Commands.add('loginBySession', (user: User) => {
   cy.session(
-    [username],
+    ['saucedemo', user.username],
     () => {
-      LoginPage.visit();
-      LoginPage.login(username, password);
-      cy.url().should('include', '/inventory.html');
+      LoginPage.visit().login(user);
+      cy.url().should('include', Routes.inventory);
     },
     {
       validate: () => {
-        cy.visit('/inventory.html');
-        cy.url().should('include', '/inventory.html');
+        // SauceDemo is a static SPA — visiting /inventory.html directly returns
+        // 404 even when authenticated, so we ignore the status code.
+        cy.visit(Routes.inventory, { failOnStatusCode: false });
+        cy.url().should('include', Routes.inventory);
       },
-    }
+      cacheAcrossSpecs: true,
+    },
   );
 });

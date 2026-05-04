@@ -1,43 +1,29 @@
 import LoginPage from '../pages/LoginPage';
+import { Routes, LoginErrors } from '../support/constants';
+import type { UsersFixture } from '../support/types';
 
-interface UserData {
-  username: string;
-  password: string;
-}
+describe('SauceDemo - Login', () => {
+  let users: UsersFixture;
 
-interface UsersFixture {
-  validUser: UserData;
-  lockedUser: UserData;
-  invalidUser: UserData;
-}
-
-describe('SauceDemo Login Tests', () => {
-  beforeEach(() => {
-    cy.fixture<UsersFixture>('auth/users').as('data');
+  before(() => {
+    cy.fixture<UsersFixture>('auth/users').then((data) => {
+      users = data;
+    });
   });
 
-  it('Login thành công với user hợp lệ', function () {
-    const data = this.data as UsersFixture;
-    cy.loginBySession(data.validUser.username, data.validUser.password);
-    cy.visit('/inventory.html');
-    cy.url().should('include', '/inventory.html');
+  it('logs in successfully with a valid user', () => {
+    cy.loginBySession(users.validUser);
+    cy.visit(Routes.inventory, { failOnStatusCode: false });
+    cy.url().should('include', Routes.inventory);
   });
 
-  it('Login thất bại với user sai thông tin', function () {
-    const data = this.data as UsersFixture;
-    cy.login(data.invalidUser.username, data.invalidUser.password);
-    LoginPage.elements
-      .errorMessage()
-      .should('be.visible')
-      .and('contain.text', 'Username and password do not match');
+  it('shows an error for invalid credentials', () => {
+    cy.login(users.invalidUser);
+    LoginPage.expectErrorContains(LoginErrors.invalidCredentials);
   });
 
-  it('Login thất bại với user bị khóa', function () {
-    const data = this.data as UsersFixture;
-    cy.login(data.lockedUser.username, data.lockedUser.password);
-    LoginPage.elements
-      .errorMessage()
-      .should('be.visible')
-      .and('contain.text', 'Sorry, this user has been locked out.');
+  it('shows an error for a locked-out user', () => {
+    cy.login(users.lockedUser);
+    LoginPage.expectErrorContains(LoginErrors.lockedOut);
   });
 });

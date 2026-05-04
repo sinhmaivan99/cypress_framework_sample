@@ -1,213 +1,121 @@
 # Cypress Framework Sample - SauceDemo E2E
 
-Framework E2E test web application SauceDemo, xay dung voi Cypress, co ho tro:
-- Chay test theo moi truong dev, staging, prod
-- To chuc Page Object Model
-- Custom command cho login va login theo session
-- Bao cao test bang Mochawesome (HTML + JSON)
-- Pipeline Jenkins de chay tu dong va publish report
+E2E framework cho ứng dụng SauceDemo, viết bằng **TypeScript + Cypress**, có:
 
-## 1. Tong quan
+- Chạy test theo môi trường `dev` / `staging` / `prod`
+- Page Object Model với fluent API
+- Custom commands: login UI, login bằng `cy.session` (cache cross-spec)
+- Báo cáo Mochawesome (HTML + JSON, có merge)
+- Pipeline Jenkins tự động chạy + publish report
 
-Project nay tap trung vao bai toan kiem thu luong dang nhap tren trang SauceDemo:
-- Login thanh cong voi tai khoan hop le
-- Login that bai voi tai khoan sai thong tin
-- Login that bai voi tai khoan bi khoa
+## 1. Cấu trúc thư mục
 
-Ngoai bo test mau, project duoc to chuc theo huong de mo rong them nhieu spec khac trong tuong lai.
+```
+cypress.config.ts                  # Cypress config + setupNodeEvents
+tsconfig.json                      # TS config gốc
+cypress/
+  tsconfig.json                    # TS config cho test code
+  config/
+    environment.ts                 # Helper resolve baseUrl + report title
+  e2e/
+    login.cy.ts                    # Spec login
+  pages/
+    LoginPage.ts                   # Page Object
+  support/
+    commands.ts                    # Custom commands (cy.login, cy.loginBySession)
+    constants.ts                   # Routes + thông điệp lỗi
+    types.ts                       # Domain types (User, UsersFixture)
+    index.d.ts                     # Khai báo type cho custom commands
+    e2e.ts                         # Entry point support
+  fixtures/
+    auth/users.json                # Test data
+reports/mochawesome/               # HTML + JSON report
+Jenkinsfile                        # CI pipeline
+```
 
-## 2. Cong nghe su dung
+## 2. Kịch bản test
 
-- Node.js + npm
-- Cypress 15.8.1
-- Mochawesome, mochawesome-merge, mochawesome-report-generator
-- TypeScript (song song voi ban JavaScript)
-- Jenkins Pipeline (CI)
+Spec `login.cy.ts` cover:
 
-## 3. Cau truc thu muc
+1. Login thành công với user hợp lệ (qua `cy.loginBySession`)
+2. Login thất bại với user sai thông tin (assert thông điệp lỗi)
+3. Login thất bại với user bị khóa
 
-- cypress/e2e/
-  - login.cy.ts: spec TypeScript
-  - login.cy.js: spec JavaScript
-- cypress/pages/
-  - LoginPage.ts: Page Object TypeScript
-  - LoginPage.js: Page Object JavaScript
-- cypress/support/
-  - commands.ts, commands.js: custom commands
-  - e2e.ts, e2e.js: diem vao support
-  - index.d.ts: khai bao typing cho custom command
-- cypress/fixtures/auth/users.json: du lieu user test
-- cypress.config.ts, cypress.config.js: cau hinh Cypress
-- reports/mochawesome/: report dau ra
-- Jenkinsfile: pipeline CI
+User test được khai báo trong `cypress/fixtures/auth/users.json`: `validUser`, `lockedUser`, `invalidUser`.
 
-Luu y:
-Project dang duy tri dong thoi ca JS va TS cho cung luong test login.
+## 3. Custom commands
 
-## 4. Kich ban test hien co
+| Command | Khi nào dùng |
+| --- | --- |
+| `cy.login(user)` | Login qua UI — phù hợp cho negative test cần kiểm tra UI lỗi |
+| `cy.loginBySession(user)` | Login cache bằng `cy.session`, reuse session giữa các test/spec |
 
-Bo test login gom 3 test case:
-1. Login thanh cong voi user hop le.
-2. Login that bai voi user sai username/password.
-3. Login that bai voi user bi khoa.
+`cy.loginBySession` có `validate` để re-login khi session hết hạn và `cacheAcrossSpecs: true` để giảm thời gian chạy.
 
-Du lieu test duoc quan ly trong fixture:
-- validUser
-- invalidUser
-- lockedUser
+## 4. Cấu hình môi trường
 
-## 5. Page Object va Custom Commands
+`cypress/config/environment.ts` resolve `baseUrl` theo thứ tự ưu tiên:
 
-### Page Object
+1. `--env baseUrl=...` truyền qua CLI
+2. Biến môi trường `CYPRESS_BASE_URL`
+3. URL theo environment (`dev` / `staging` / `prod`)
+4. Fallback về `dev`
 
-LoginPage dong vai tro gom locator va hanh dong:
-- Truy cap trang login
-- Nhap username
-- Nhap password
-- Bam nut login
+Chọn môi trường qua `--env environment=staging` hoặc biến `TEST_ENV`. Staging/Prod URL có thể override bằng `CYPRESS_BASE_URL_STAGING` / `CYPRESS_BASE_URL_PROD`.
 
-### Custom Commands
+## 5. Cấu hình test (cypress.config.ts)
 
-- cy.login(username, password)
-  - Login qua UI, phu hop cho test negative.
-- cy.loginBySession(username, password)
-  - Login thong qua cy.session de tai su dung session.
-  - Co ham validate de dam bao session van hop le truoc khi su dung.
+- `retries`: runMode = 2, openMode = 0
+- `defaultCommandTimeout` = 8000
+- `requestTimeout` = 15000, `responseTimeout` = 30000, `pageLoadTimeout` = 60000
+- `video` = true — tự xoá video khi spec pass 100% để giảm artifact
+- `screenshotOnRunFailure` = true
 
-## 6. Cau hinh moi truong va baseUrl
+Report title được enrich bằng metadata CI (BUILD_NUMBER, GIT_BRANCH, GIT_COMMIT) khi chạy trên Jenkins.
 
-Cau hinh ho tro map moi truong sang baseUrl:
-- dev: mac dinh https://www.saucedemo.com/
-- staging: lay tu CYPRESS_BASE_URL_STAGING neu co
-- prod: lay tu CYPRESS_BASE_URL_PROD neu co
+## 6. Scripts npm
 
-Thu tu uu tien baseUrl:
-1. env baseUrl truyen truc tiep cho Cypress
-2. bien moi truong CYPRESS_BASE_URL
-3. baseUrl theo environment (dev/staging/prod)
-4. fallback ve dev
+| Script | Mô tả |
+| --- | --- |
+| `npm run cy:open` | Mở Cypress runner |
+| `npm test` / `npm run test:dev` | Chạy test môi trường dev |
+| `npm run test:staging` | Chạy test môi trường staging |
+| `npm run test:prod` | Chạy test môi trường prod |
+| `npm run test:login` | Chạy riêng spec login |
+| `npm run clean:reports` | Xoá thư mục report |
+| `npm run report:merge` | Merge các JSON report thành `report.json` |
+| `npm run report:generate` | Sinh HTML từ `report.json` |
+| `npm run test:report` | Pipeline đầy đủ: clean → test → merge → generate |
 
-Chon moi truong chay qua bien env environment hoac TEST_ENV.
+## 7. Chạy local
 
-## 7. Retry, timeout, video, screenshot
-
-Project da cau hinh:
-- retries runMode = 2, openMode = 0
-- defaultCommandTimeout = 8000
-- requestTimeout = 15000
-- responseTimeout = 30000
-- pageLoadTimeout = 60000
-- screenshotOnRunFailure = true
-- video = true
-
-Toi uu artifact:
-- Video se bi xoa neu spec pass 100% (hook after:spec), giup giam dung luong report artifact.
-
-## 8. Scripts npm
-
-Trong package.json co cac script chinh:
-
-- npm test
-  - Chay test voi environment=dev
-- npm run test:dev
-- npm run test:staging
-- npm run test:prod
-- npm run test:login
-  - Chay rieng spec login.cy.js
-- npm run merge-reports
-  - Gop cac file JSON report thanh report.json
-- npm run generate-report
-  - Sinh file HTML report tu report.json
-- npm run test:report
-  - Chay test + merge report + generate report
-
-## 9. Huong dan chay local
-
-### Buoc 1: Cai dependency
-
+```bash
 npm ci
-
-### Buoc 2: Cai binary Cypress
-
 npx cypress install
+npm test                    # chạy dev
+npm run test:staging        # chạy staging
+npm run test:report         # chạy + tạo report tổng hợp
+```
 
-### Buoc 3: Chay test
+Report HTML tổng hợp ở `reports/mochawesome/mochawesome.html`.
 
-Chay mac dinh dev:
+## 8. Jenkins CI
 
-npm test
+Pipeline (`Jenkinsfile`):
 
-Chay theo moi truong:
-
-npm run test:staging
-npm run test:prod
-
-Chay 1 spec:
-
-npm run test:login
-
-### Buoc 4: Tao report tong hop
-
-npm run test:report
-
-Report HTML duoc tao tai:
-- reports/mochawesome/mochawesome.html
-
-## 10. Jenkins CI pipeline
-
-Pipeline gom cac stage:
 1. Checkout
-2. Install Dependencies (npm ci)
-3. Install Cypress (npx cypress install)
-4. Run Cypress Tests + Build Report (npm run test:report)
-5. Archive Artifacts (reports/mochawesome/**/*)
+2. `npm ci`
+3. `npx cypress install`
+4. `npm run test:report` + `publishHTML`
+5. Archive `reports/mochawesome/**/*`
 
-Diem noi bat:
-- Co lich cron chay tu dong cac ngay trong tuan.
-- Publish report HTML len Jenkins bang publishHTML.
-- Luu artifact report de truy vet ket qua lich su.
+Có cron `H 1 * * 1-5` (khoảng 1h sáng giờ VN, T2-T6).
 
-## 11. Bao cao test
+## 9. Mở rộng framework
 
-Project dung Mochawesome:
-- Moi lan run tao json/html rieng (overwrite=false)
-- Co the merge nhieu json thanh mot report tong
-- Da co du lieu report mau trong thu muc reports/mochawesome
-
-Thong ke report mau hien tai:
-- Suites: 1
-- Tests: 3
-- Passes: 3
-- Failures: 0
-
-## 12. TypeScript support
-
-- tsconfig goc bat strict mode.
-- cypress/tsconfig.json mo rong tu tsconfig goc va them types cho Cypress + Node.
-- cypress/support/index.d.ts khai bao typing cho custom commands.
-
-## 13. Cach mo rong framework
-
-Goi y mo rong:
-- Them page object cho man hinh moi trong cypress/pages
-- Them custom command dung chung vao cypress/support/commands.ts
-- Them fixture theo domain vao cypress/fixtures
-- Tao spec moi trong cypress/e2e
-- Them script chay theo tag/spec neu can
-
-## 14. Luu y van hanh
-
-- Hien tai ton tai song song file JS va TS cho cung nghiep vu login. Nhom nen thong nhat huong su dung (uu tien TS hoac JS) de tranh trung lap ve lau dai.
-- Neu su dung Jenkins hoac moi truong CI khac, can dam bao bien moi truong base URL duoc truyen dung theo tung environment.
-
-## 15. Lenh nhanh
-
-npm ci
-npx cypress install
-npm run test:report
-
----
-
-Neu ban muon, co the tach them 2 tai lieu rieng:
-- CONTRIBUTING.md (quy uoc them test)
-- TROUBLESHOOTING.md (xu ly loi thuong gap khi chay Cypress tren CI)
+- Thêm Page Object mới ở `cypress/pages/`
+- Thêm route/thông điệp dùng chung ở `cypress/support/constants.ts`
+- Thêm types domain ở `cypress/support/types.ts`
+- Thêm custom command ở `cypress/support/commands.ts` và khai báo trong `index.d.ts`
+- Thêm fixture theo domain ở `cypress/fixtures/<domain>/`
+- Thêm spec ở `cypress/e2e/<feature>.cy.ts`

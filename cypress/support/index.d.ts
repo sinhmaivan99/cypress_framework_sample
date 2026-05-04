@@ -1,21 +1,27 @@
 /// <reference types="cypress" />
 
-declare namespace Cypress {
-  interface Chainable {
-    /**
-     * Custom command to log in via UI (dùng cho negative test cases).
-     * @param username - Tên đăng nhập
-     * @param password - Mật khẩu
-     * @example cy.login('standard_user', 'secret_sauce')
-     */
-    login(username: string, password: string): Chainable<void>;
+import type { User } from './types';
 
-    /**
-     * Custom command to log in via cy.session (session được cache — dùng cho test cần đăng nhập sẵn).
-     * @param username - Tên đăng nhập
-     * @param password - Mật khẩu
-     * @example cy.loginBySession('standard_user', 'secret_sauce')
-     */
-    loginBySession(username: string, password: string): Chainable<void>;
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      /**
+       * Log in via UI. Suitable for negative test cases that need to assert
+       * error messaging.
+       *
+       * @example cy.login({ username: 'standard_user', password: 'secret_sauce' })
+       */
+      login(user: User): Chainable<void>;
+
+      /**
+       * Log in via `cy.session` so the authenticated state is cached and
+       * reused across tests.
+       *
+       * @example cy.loginBySession(users.validUser)
+       */
+      loginBySession(user: User): Chainable<void>;
+    }
   }
 }
+
+export {};
